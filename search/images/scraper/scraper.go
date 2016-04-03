@@ -71,8 +71,7 @@ func ParseFlickrResult(r io.Reader) []Image {
 	return images
 }
 
-// ParseBingResult parses a bing response and returns an array of the images the search returned
-func ParseBingResult(r io.Reader) []Image {
+func parseType1Results(r io.Reader, requiredSubString, source string) []Image {
 	images := []Image{}
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -85,30 +84,19 @@ func ParseBingResult(r io.Reader) []Image {
 	res = regexp.MustCompile(`.*src=["']`).ReplaceAllString(res, "")
 	res = regexp.MustCompile(`['"].*`).ReplaceAllString(res, "")
 
-	for _, url := range regexp.MustCompile("http.*").FindAllString(res, -1) {
-		images = append(images, Image{URL: url, Source: "bing"})
+	for _, url := range regexp.MustCompile(".*"+requiredSubString+".*").FindAllString(res, -1) {
+		images = append(images, Image{URL: url, Source: source})
 	}
 
 	return images
 }
 
+// ParseBingResult parses a bing response and returns an array of the images the search returned
+func ParseBingResult(r io.Reader) []Image {
+	return parseType1Results(r, "http", "bing")
+}
+
 // ParseShutterstockResult parses a shutterstock response and returns an array of the images the search returned
 func ParseShutterstockResult(r io.Reader) []Image {
-	images := []Image{}
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
-		log.Fatal(err)
-	}
-	body := string(b)
-
-	res := regexp.MustCompile(`<img`).ReplaceAllString(body, "\n<img")
-	res = strings.Join(regexp.MustCompile("<img.*").FindAllString(res, -1), "\n")
-	res = regexp.MustCompile(`.*src=["']`).ReplaceAllString(res, "")
-	res = regexp.MustCompile(`['"].*`).ReplaceAllString(res, "")
-
-	for _, url := range regexp.MustCompile(".*thumb.*").FindAllString(res, -1) {
-		images = append(images, Image{URL: url, Source: "shutterstock"})
-	}
-
-	return images
+	return parseType1Results(r, "thumb", "shutterstock")
 }
