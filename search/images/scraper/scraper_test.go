@@ -13,6 +13,13 @@ func ExampleBingURL() {
 	// http://www.bing.com/images/search?q=$innoq&scope=images
 }
 
+func TestBingURL(t *testing.T) {
+	expected := "http://www.bing.com/images/search?q=$innoq&scope=images"
+	if got := BingURL("innoq"); got != expected {
+		t.Errorf("\nexpected: %s\ngot      :%s\n")
+	}
+}
+
 func TestBingParser(t *testing.T) {
 	expected := []Image{
 		{Source: "bing", URL: "http://tse3.mm.bing.net/th?id=OIP.M01828aeb8c6437d79d6f7122bff6e8ffH0&amp;w=230&amp;h=170&amp;rs=1&amp;pcl=dddddd&amp;pid=1.1"},
