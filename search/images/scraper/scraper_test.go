@@ -1,10 +1,17 @@
 package scraper
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+func ExampleBingURL() {
+	fmt.Printf("%s", BingURL("innoq"))
+	// Output:
+	// http://www.bing.com/images/search?q=$innoq&scope=images
+}
 
 func TestBingParser(t *testing.T) {
 	expected := []Image{
