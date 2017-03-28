@@ -1,3 +1,18 @@
+// Package scraper scrapes image urls from image search machines.
+//
+//     url := BingURL("apple")
+//     imgs := []Images{}
+//
+//     resp, err := http.Get(url)
+//     if err != nil {
+//     	return fmt.Errorf("error getting %s: %s\n", url, err), nil
+//     }
+//
+//     for _, img := range parser(resp.Body) {
+//     	imgs = append(imgs, img)
+//     }
+//
+//	return nil, imgs
 package scraper
 
 import (
