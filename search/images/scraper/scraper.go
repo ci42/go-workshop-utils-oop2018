@@ -12,7 +12,6 @@
 //     	imgs = append(imgs, img)
 //     }
 //
-//	return nil, imgs
 package scraper
 
 import (
