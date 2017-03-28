@@ -1,15 +1,19 @@
 // Package scraper scrapes image urls from image search machines.
 //
-//     url := BingURL("apple")
-//     imgs := []Images{}
+//     import "gitlab.innoq.com/daniel/go-workshop-utils/search/images/scraper"
+//
+//     ...
+//
+//     url := scraper.FlickrURL("apple")
+//     imgs := []scraper.Image{}
 //
 //     resp, err := http.Get(url)
 //     if err != nil {
-//     	return fmt.Errorf("error getting %s: %s\n", url, err), nil
+//       return fmt.Errorf("error getting %s: %s\n", url, err)
 //     }
 //
-//     for _, img := range parser(resp.Body) {
-//     	imgs = append(imgs, img)
+//     for _, img := range scraper.ParseFlickrResult(resp.Body) {
+//       imgs = append(imgs, img)
 //     }
 //
 package scraper
