@@ -25,7 +25,6 @@ import (
 	"log"
 	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/alecthomas/template"
 )
@@ -94,7 +93,7 @@ imageAddLoop:
 	return images
 }
 
-func parseType1Results(r io.Reader, requiredSubString, source string) []Image {
+func extractUnsplashImageUrls(r io.Reader) []Image {
 	images := []Image{}
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -102,13 +101,17 @@ func parseType1Results(r io.Reader, requiredSubString, source string) []Image {
 	}
 	body := string(b)
 
-	res := regexp.MustCompile(`<img`).ReplaceAllString(body, "\n<img")
-	res = strings.Join(regexp.MustCompile("<img.*").FindAllString(res, -1), "\n")
-	res = regexp.MustCompile(`.*src=["']`).ReplaceAllString(res, "")
-	res = regexp.MustCompile(`['"].*`).ReplaceAllString(res, "")
-
-	for _, url := range regexp.MustCompile(".*"+requiredSubString+".*").FindAllString(res, -1) {
-		images = append(images, Image{URL: url, Source: source})
+	res := regexp.MustCompile(` "small":['"](.*?)/?['"]`).FindAllStringSubmatch(regexp.MustCompile(`\u002F`).ReplaceAllString(body, "/"), -1)
+	fmt.Println("Found: " + strconv.Itoa(len(res)) + "images on: unsplash")
+	fmt.Printf("Matching Result: %q\n", res)
+imageAddLoop:
+	for _, url := range res {
+		for _, img := range images {
+			if img.URL == url[1] {
+				continue imageAddLoop
+			}
+		}
+		images = append(images, Image{URL: url[1], Source: "unsplash"})
 	}
 
 	return images
@@ -127,5 +130,5 @@ func ParsePixabayResult(r io.Reader) []Image {
 
 // ParseBingResult parses a bing response and returns an array of the images the search returned
 func ParseUnsplashResult(r io.Reader) []Image {
-	return extractImageUrls(r, "https://images.unsplash.com/photo", "unsplash")
+	return extractUnsplashImageUrls(r)
 }
