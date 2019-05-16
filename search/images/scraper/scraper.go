@@ -44,7 +44,7 @@ func (i Image) String() string {
 }
 
 const (
-	bingURLFormatString         = "https://www.bing.com/images/search?q=%s&scope=images"
+	pexelURLFormatString        = "https://www.pexels.com/de-de/suche/%s/"
 	pixabayURLFormatString	    = "https://pixabay.com/images/search/%s/"
 	unsplashURLFormatString     = "https://unsplash.com/search/photos/%s/"
 )
@@ -52,8 +52,8 @@ const (
 // BingURL returns the bing url that searches for a specific image
 //
 //   q: search term
-func BingURL(q string) string {
-	return fmt.Sprintf(bingURLFormatString, template.URLQueryEscaper(q))
+func PexelURL(q string) string {
+	return fmt.Sprintf(pexelURLFormatString, template.URLQueryEscaper(q))
 }
 
 // PixabayURL returns the pixabay url that searches for a specific image
@@ -78,7 +78,7 @@ func extractImageUrls(r io.Reader, urlPart string, source string) []Image {
 	}
 	body := string(b)
 
-	res := regexp.MustCompile(`src=['"](`+urlPart+`.*?)/?['"]`).FindAllStringSubmatch(body, -1)
+	res := regexp.MustCompile(` src=['"](`+urlPart+`.*?)/?['"]`).FindAllStringSubmatch(body, -1)
 	fmt.Println("Found: " + strconv.Itoa(len(res)) + "images on: " + source)
 	fmt.Printf("Matching Result: %q\n", res)
 	for _, url := range res {
@@ -109,8 +109,8 @@ func parseType1Results(r io.Reader, requiredSubString, source string) []Image {
 }
 
 // ParseBingResult parses a bing response and returns an array of the images the search returned
-func ParseBingResult(r io.Reader) []Image {
-	return extractImageUrls(r, "https://www.bing.com/th", "bing")
+func ParsePexelResult(r io.Reader) []Image {
+	return extractImageUrls(r, "https://images.pexels.com/photos", "pexel")
 	//return parseType1Results(r, "http", "bing")
 }
 
