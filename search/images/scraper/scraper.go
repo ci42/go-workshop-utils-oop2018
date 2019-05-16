@@ -82,6 +82,11 @@ func extractImageUrls(r io.Reader, urlPart string, source string) []Image {
 	fmt.Println("Found: " + strconv.Itoa(len(res)) + "images on: " + source)
 	fmt.Printf("Matching Result: %q\n", res)
 	for _, url := range res {
+		for _, img := range images {
+			if img.URL == url[1] {
+				continue
+			}
+		}
 		images = append(images, Image{URL: url[1], Source: source})
 	}
 
