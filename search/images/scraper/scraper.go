@@ -24,8 +24,8 @@ import (
 	"io/ioutil"
 	"log"
 	"regexp"
-	"strings"
 	"strconv"
+	"strings"
 
 	"github.com/alecthomas/template"
 )
@@ -44,9 +44,9 @@ func (i Image) String() string {
 }
 
 const (
-	pexelURLFormatString        = "https://www.pexels.com/de-de/suche/%s/"
-	pixabayURLFormatString	    = "https://pixabay.com/images/search/%s/"
-	unsplashURLFormatString     = "https://unsplash.com/search/photos/%s/"
+	pexelURLFormatString    = "https://www.pexels.com/de-de/suche/%s/"
+	pixabayURLFormatString  = "https://pixabay.com/images/search/%s/"
+	unsplashURLFormatString = "https://unsplash.com/search/photos/%s/"
 )
 
 // BingURL returns the bing url that searches for a specific image
@@ -81,10 +81,11 @@ func extractImageUrls(r io.Reader, urlPart string, source string) []Image {
 	res := regexp.MustCompile(` src=['"](`+urlPart+`.*?)/?['"]`).FindAllStringSubmatch(body, -1)
 	fmt.Println("Found: " + strconv.Itoa(len(res)) + "images on: " + source)
 	fmt.Printf("Matching Result: %q\n", res)
+imageAddLoop:
 	for _, url := range res {
 		for _, img := range images {
 			if img.URL == url[1] {
-				continue
+				continue imageAddLoop
 			}
 		}
 		images = append(images, Image{URL: url[1], Source: source})
