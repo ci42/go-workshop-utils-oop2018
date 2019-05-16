@@ -101,7 +101,7 @@ func extractUnsplashImageUrls(r io.Reader) []Image {
 	}
 	body := string(b)
 
-	res := regexp.MustCompile(`"small":['"](.*?)/?['"]`).FindAllStringSubmatch(regexp.MustCompile(`\	\u002F`).ReplaceAllString(body, "/"), -1)
+	res := regexp.MustCompile(`"small":['"](.*?)/?['"]`).FindAllStringSubmatch(regexp.MustCompile(`\\u002F`).ReplaceAllString(body, "/"), -1)
 	fmt.Println("Found: " + strconv.Itoa(len(res)) + "images on: unsplash")
 	fmt.Printf("Matching Result: %q\n", res)
 imageAddLoop:
