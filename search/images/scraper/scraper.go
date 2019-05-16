@@ -77,7 +77,7 @@ func extractImageUrls(r io.Reader, urlPart string, source string) []Image {
 	}
 	body := string(b)
 
-	res := regexp.MustCompile(`src=['"](`+urlPart+`.*?)['"]`).FindAllStringSubmatch(body, -1)
+	res := regexp.MustCompile(`src=['"](`+urlPart+`.*?)/?['"]`).FindAllStringSubmatch(body, -1)
 	for _, url := range res {
 		images = append(images, Image{URL: url[1], Source: source})
 	}
