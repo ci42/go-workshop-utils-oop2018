@@ -43,9 +43,9 @@ func (i Image) String() string {
 }
 
 const (
-	bingURLFormatString         = "http://www.bing.com/images/search?q=$%s&scope=images"
-	shutterstockURLFormatString = "http://www.shutterstock.com/cat.mhtml?autocomplete_id=&language=de&lang=de&search_source=&safesearch=1&version=llv1&searchterm=%s&media_type=images"
-	flickrURLFormatString       = "https://www.flickr.com/search/?text=%s"
+	bingURLFormatString         = "https://www.bing.com/images/search?q=%s&scope=images"
+	pixabayURLFormatString	    = "https://pixabay.com/images/search/%s/"
+	unsplashURLFormatString     = "https://unsplash.com/search/photos/%s/"
 )
 
 // BingURL returns the bing url that searches for a specific image
@@ -55,22 +55,21 @@ func BingURL(q string) string {
 	return fmt.Sprintf(bingURLFormatString, template.URLQueryEscaper(q))
 }
 
-// FlickURL returns the flickr url that searches for a specific image
+// PixabayURL returns the pixabay url that searches for a specific image
 //
 //   q: search term
-func FlickrURL(q string) string {
-	return fmt.Sprintf(flickrURLFormatString, template.URLQueryEscaper(q))
+func PixabayURL(q string) string {
+	return fmt.Sprintf(pixabayURLFormatString, template.URLQueryEscaper(q))
 }
 
-// ShutterstokURL returns the shutterstock url that searches for a specific image
+// UnsplashURL returns the unsplash url that searches for a specific image
 //
 //   q: search term
-func ShutterstockURL(q string) string {
-	return fmt.Sprintf(shutterstockURLFormatString, template.URLQueryEscaper(q))
+func UnsplashURL(q string) string {
+	return fmt.Sprintf(unsplashURLFormatString, template.URLQueryEscaper(q))
 }
 
-// ParseFlickrResult parses a flickr response and returns an array of the images the search returned
-func ParseFlickrResult(r io.Reader) []Image {
+func extractImageUrls(r io.Reader, urlPart string) []Image {
 	images := []Image{}
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -78,12 +77,9 @@ func ParseFlickrResult(r io.Reader) []Image {
 	}
 	body := string(b)
 
-	res := strings.Join(regexp.MustCompile(`img\.src=.*`).FindAllString(body, -1), "\n")
-	res = regexp.MustCompile(`img\.src='`).ReplaceAllString(res, "http:")
-	res = regexp.MustCompile(`'.*`).ReplaceAllString(res, "")
-
-	for _, url := range regexp.MustCompile("http.*").FindAllString(res, -1) {
-		images = append(images, Image{URL: url, Source: "flickr"})
+	res := regexp.MustCompile(`src=['"](`+urlPart+`.*?)['"]`).FindAllStringSubmatch(body, -1)
+	for _, url := range res {
+		images = append(images, Image{URL: url[1], Source: "pixabay"})
 	}
 
 	return images
@@ -111,10 +107,16 @@ func parseType1Results(r io.Reader, requiredSubString, source string) []Image {
 
 // ParseBingResult parses a bing response and returns an array of the images the search returned
 func ParseBingResult(r io.Reader) []Image {
-	return parseType1Results(r, "http", "bing")
+	return extractImageUrls(r, "https://www.bing.com/th")
+	//return parseType1Results(r, "http", "bing")
 }
 
-// ParseShutterstockResult parses a shutterstock response and returns an array of the images the search returned
-func ParseShutterstockResult(r io.Reader) []Image {
-	return parseType1Results(r, "thumb", "shutterstock")
+// ParseBingResult parses a bing response and returns an array of the images the search returned
+func ParsePixabayResult(r io.Reader) []Image {
+	return extractImageUrls(r, "https://cdn.pixabay.com/photo/")
+}
+
+// ParseBingResult parses a bing response and returns an array of the images the search returned
+func ParseUnsplashResult(r io.Reader) []Image {
+	return extractImageUrls(r, "https://images.unsplash.com/photo-1")
 }
